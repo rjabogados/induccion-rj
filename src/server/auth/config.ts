@@ -1,9 +1,4 @@
-import { PrismaAdapter } from "@auth/prisma-adapter";
 import { type DefaultSession, type NextAuthConfig } from "next-auth";
-import CredentialsProvider from "next-auth/providers/credentials";
-import bcrypt from "bcryptjs";
-import { z } from "zod";
-import { db } from "~/server/db";
 
 declare module "next-auth" {
   interface Session extends DefaultSession {
@@ -31,39 +26,7 @@ declare module "next-auth/jwt" {
 
 export const authConfig = {
   session: { strategy: "jwt" },
-  providers: [
-    CredentialsProvider({
-      name: "DNI",
-      credentials: {
-        dni: { label: "DNI", type: "text", placeholder: "Escribe tu DNI" },
-        password: { label: "Contraseña", type: "password" }
-      },
-      async authorize(credentials) {
-        const parsedCredentials = z
-          .object({ dni: z.string().min(8), password: z.string().min(6) })
-          .safeParse(credentials);
-        
-        if (parsedCredentials.success) {
-          const { dni, password } = parsedCredentials.data;
-          const user = await db.user.findUnique({ where: { dni } });
-          
-          if (!user || !user.password) return null;
-          
-          const passwordsMatch = await bcrypt.compare(password, user.password);
-          if (passwordsMatch) {
-            return {
-              id: user.id,
-              dni: user.dni ?? dni,
-              role: user.role,
-              name: user.name,
-              email: user.email,
-            };
-          }
-        }
-        return null;
-      }
-    })
-  ],
+  providers: [],
   callbacks: {
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user;

@@ -1,5 +1,5 @@
 import { auth } from "~/server/auth"
-import { Button } from "~/components/ui/button"
+import { buttonVariants } from "~/components/ui/button"
 import Link from "next/link"
 
 export async function TopNav() {
@@ -15,9 +15,9 @@ export async function TopNav() {
             Rol: <span className="font-bold">{session.user.role}</span> | DNI: {session.user.dni}
           </span>
         )}
-        <Button variant="outline" asChild>
-          <Link href="/api/auth/signout">Salir</Link>
-        </Button>
+        <Link href="/api/auth/signout" className={buttonVariants({ variant: "outline" })}>
+          Salir
+        </Link>
       </div>
     </header>
   )

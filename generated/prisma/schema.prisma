@@ -15,16 +15,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Post {
-  id        Int      @id @default(autoincrement())
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  createdBy   User   @relation(fields: [createdById], references: [id])
-  createdById String
-
-  @@index([name])
+enum Role {
+  ADMIN
+  RRHH
+  CALIDAD
+  GESTOR
+  COLABORADOR
 }
 
 // Necessary for Next auth
@@ -61,9 +57,19 @@ model User {
   email         String?   @unique
   emailVerified DateTime?
   image         String?
-  accounts      Account[]
-  sessions      Session[]
-  posts         Post[]
+
+  // Custom RJ Hub fields
+  dni         String? @unique
+  password    String?
+  role        Role    @default(COLABORADOR)
+  intranet_id String?
+
+  accounts Account[]
+  sessions Session[]
+
+  progress     UserProgress[]
+  certificates Certificate[]
+  forms        FormSubmission[]
 }
 
 model VerificationToken {
@@ -72,4 +78,94 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model Module {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  order       Int      @default(0)
+  courses     Course[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Course {
+  id           String         @id @default(cuid())
+  title        String
+  description  String?
+  contentUrl   String?
+  moduleId     String
+  module       Module         @relation(fields: [moduleId], references: [id])
+  assessment   Assessment?
+  progress     UserProgress[]
+  certificates Certificate[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+}
+
+model Assessment {
+  id        String     @id @default(cuid())
+  courseId  String     @unique
+  course    Course     @relation(fields: [courseId], references: [id])
+  passScore Int        @default(70)
+  questions Question[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model Question {
+  id           String     @id @default(cuid())
+  assessmentId String
+  assessment   Assessment @relation(fields: [assessmentId], references: [id])
+  text         String
+  options      Option[]
+}
+
+model Option {
+  id         String   @id @default(cuid())
+  questionId String
+  question   Question @relation(fields: [questionId], references: [id])
+  text       String
+  isCorrect  Boolean  @default(false)
+}
+
+enum ProgressStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+}
+
+model UserProgress {
+  id        String         @id @default(cuid())
+  userId    String
+  user      User           @relation(fields: [userId], references: [id])
+  courseId  String
+  course    Course         @relation(fields: [courseId], references: [id])
+  status    ProgressStatus @default(PENDING)
+  score     Int?
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  @@unique([userId, courseId])
+}
+
+model Certificate {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  courseId  String
+  course    Course   @relation(fields: [courseId], references: [id])
+  issueDate DateTime @default(now())
+
+  @@unique([userId, courseId])
+}
+
+model FormSubmission {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  formType  String // e.g. "REGLAMENTO", "SEGURIDAD", "CONDUCTA"
+  accepted  Boolean  @default(true)
+  createdAt DateTime @default(now())
 }
