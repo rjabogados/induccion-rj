@@ -17,28 +17,40 @@ const { auth: uncachedAuth, handlers, signIn, signOut } = NextAuth({
         password: { label: "Contraseña", type: "password" }
       },
       async authorize(credentials) {
-        const parsedCredentials = z
-          .object({ dni: z.string().min(8), password: z.string().min(6) })
-          .safeParse(credentials);
-        
-        if (parsedCredentials.success) {
-          const { dni, password } = parsedCredentials.data;
-          const user = await db.user.findUnique({ where: { dni } });
+        try {
+          const parsedCredentials = z
+            .object({ dni: z.string().min(8), password: z.string().min(6) })
+            .safeParse(credentials);
           
-          if (!user?.password) return null;
-          
-          const passwordsMatch = await bcrypt.compare(password, user.password);
-          if (passwordsMatch) {
-            return {
-              id: user.id,
-              dni: user.dni ?? dni,
-              role: user.role,
-              name: user.name,
-              email: user.email,
-            };
+          if (parsedCredentials.success) {
+            const { dni, password } = parsedCredentials.data;
+            const user = await db.user.findUnique({ where: { dni } });
+            
+            if (!user || !user.password) {
+              console.log("User not found or no password for DNI:", dni);
+              return null;
+            }
+            
+            const passwordsMatch = await bcrypt.compare(password, user.password);
+            if (passwordsMatch) {
+              return {
+                id: user.id,
+                dni: user.dni ?? dni,
+                role: user.role,
+                name: user.name,
+                email: user.email,
+              };
+            } else {
+              console.log("Password mismatch for DNI:", dni);
+            }
+          } else {
+            console.log("Validation failed:", parsedCredentials.error);
           }
+          return null;
+        } catch (error) {
+          console.error("Authorize Error:", error);
+          throw error;
         }
-        return null;
       }
     })
   ],
