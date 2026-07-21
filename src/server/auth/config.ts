@@ -28,6 +28,9 @@ declare module "next-auth/jwt" {
 export const authConfig = {
   trustHost: true,
   session: { strategy: "jwt" },
+  pages: {
+    signIn: '/login',
+  },
   providers: [],
   callbacks: {
     authorized({ auth, request: { nextUrl } }) {
