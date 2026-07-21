@@ -4,6 +4,7 @@ import { Button } from "~/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "~/components/ui/card"
 import { Input } from "~/components/ui/input"
 import { Label } from "~/components/ui/label"
+import Image from "next/image"
 import { useActionState } from "react"
 import { authenticate } from "./actions"
 
@@ -13,8 +14,8 @@ export default function LoginPage() {
   return (
     <div className="flex h-screen w-full items-center justify-center bg-zinc-50">
       <Card className="w-full max-w-sm">
-        <CardHeader>
-          <CardTitle className="text-2xl">RJ Induction Hub</CardTitle>
+        <CardHeader className="items-center">
+          <Image src="/logo_completo.png" alt="RJ Abogados" width={250} height={75} className="mb-2" />
           <CardDescription>
             Ingresa tu DNI y contraseña para continuar.
           </CardDescription>
