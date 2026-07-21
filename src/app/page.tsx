@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Button } from "~/components/ui/button";
+import { buttonVariants } from "~/components/ui/button";
 
 export default function Home() {
   return (
@@ -11,9 +11,9 @@ export default function Home() {
         <p className="text-2xl text-center">
           Plataforma de Inducción Corporativa
         </p>
-        <Button asChild size="lg">
-          <Link href="/login">Ingresar</Link>
-        </Button>
+        <Link href="/login" className={buttonVariants({ size: "lg" })}>
+          Ingresar
+        </Link>
       </div>
     </main>
   );
