@@ -43,7 +43,7 @@ export const authConfig = {
     },
     jwt: async ({ token, user }) => {
       if (user) {
-        token.id = user.id as string;
+        token.id = user.id!;
         token.dni = user.dni;
         token.role = user.role;
       }
@@ -53,9 +53,9 @@ export const authConfig = {
       ...session,
       user: {
         ...session.user,
-        id: token.id as string,
-        dni: token.dni as string,
-        role: token.role as string,
+        id: token.id,
+        dni: token.dni,
+        role: token.role,
       },
     }),
   },

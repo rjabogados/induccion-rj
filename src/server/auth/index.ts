@@ -25,7 +25,7 @@ const { auth: uncachedAuth, handlers, signIn, signOut } = NextAuth({
           const { dni, password } = parsedCredentials.data;
           const user = await db.user.findUnique({ where: { dni } });
           
-          if (!user || !user.password) return null;
+          if (!user?.password) return null;
           
           const passwordsMatch = await bcrypt.compare(password, user.password);
           if (passwordsMatch) {

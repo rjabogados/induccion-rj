@@ -4,7 +4,7 @@ export type AppActions = 'manage' | 'create' | 'read' | 'update' | 'delete';
 export type AppSubjects = 'User' | 'Course' | 'Module' | 'Assessment' | 'Certificate' | 'FormSubmission' | 'all';
 
 export function defineAbilityFor(role: string) {
-  return defineAbility((can, cannot) => {
+  return defineAbility((can) => {
     if (role === 'ADMIN') {
       can('manage', 'all');
     } else if (role === 'RRHH') {
