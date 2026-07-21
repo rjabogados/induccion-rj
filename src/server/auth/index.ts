@@ -26,7 +26,7 @@ const { auth: uncachedAuth, handlers, signIn, signOut } = NextAuth({
             const { dni, password } = parsedCredentials.data;
             const user = await db.user.findUnique({ where: { dni } });
             
-            if (!user || !user.password) {
+            if (!user?.password) {
               console.log("User not found or no password for DNI:", dni);
               return null;
             }
